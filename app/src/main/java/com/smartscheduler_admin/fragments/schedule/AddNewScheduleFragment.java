@@ -1,5 +1,6 @@
 package com.smartscheduler_admin.fragments.schedule;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,26 +24,26 @@ import com.google.firebase.database.ValueEventListener;
 import com.smartscheduler_admin.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class AddNewScheduleFragment extends Fragment {
-    EditText etDay;
     EditText etStartingTime;
     EditText etEndingTime;
     EditText etCreditHour;
-
+    Spinner DaysSpinner;
     Spinner CourseSpinner;
     Spinner FacultySpinner;
     Spinner RoomSpinner;
     Spinner SemesterSpinner;
     Spinner DepartmentSpinner;
-
+    private int  mHour, mMinute;
     Button addNewSchedule;
 
-    ArrayAdapter<String> adapterCourse,adapterFaculty,adapterRoom,adapterSemester,adapterDepartment;
+    ArrayAdapter<String> adapterDays, adapterCourse,adapterFaculty,adapterRoom,adapterSemester,adapterDepartment;
 
     DatabaseReference myRef;
     FirebaseAuth mAuth;
-
+    ArrayList<String> DaysList = new ArrayList<>();
     ArrayList<String> CourseList = new ArrayList<>();
     ArrayList<String> FacultyList = new ArrayList<>();
     ArrayList<String> RoomList = new ArrayList<>();
@@ -60,6 +61,15 @@ public class AddNewScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_new_schedule, container, false);
+
+
+
+        DaysList.add("Monday");
+        DaysList.add("Tuesday");
+        DaysList.add("Wednesday");
+        DaysList.add("Thursday");
+        DaysList.add("Friday");
+        DaysList.add("Saturday");
 
         CourseList.add("Course 1");
         CourseList.add("Course 2");
@@ -95,16 +105,64 @@ public class AddNewScheduleFragment extends Fragment {
         SemesterList.add("7");
         SemesterList.add("8");
 
-        etDay = view.findViewById(R.id.editText_Day);
         etCreditHour = view.findViewById(R.id.editText_CreditHour);
         etStartingTime = view.findViewById(R.id.editText_StartingTime);
         etEndingTime = view.findViewById(R.id.editText_EndingTime);
-
+        DaysSpinner = view.findViewById(R.id.allDaysSpinner);
         CourseSpinner = view.findViewById(R.id.allCoursesSpinner);
         FacultySpinner = view.findViewById(R.id.allFacultySpinner);
         RoomSpinner = view.findViewById(R.id.allRoomSpinner);
         SemesterSpinner = view.findViewById(R.id.allSemesterSpinner);
         DepartmentSpinner = view.findViewById(R.id.allDepartmentSpinner);
+
+        etStartingTime.setOnClickListener(v -> {
+
+            // Get Current Time
+            final Calendar c = Calendar.getInstance();
+            mHour = c.get(Calendar.HOUR_OF_DAY);
+            mMinute = c.get(Calendar.MINUTE);
+
+            // Launch Time Picker Dialog
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                    (view1, hourOfDay, minute) -> {
+                        if (hourOfDay > 12) {
+                            etStartingTime.setText(hourOfDay - 12 + ":" + minute + " PM");
+                        } else {
+                            etStartingTime.setText(hourOfDay + ":" + minute + " AM");
+                        }
+                    }, mHour, mMinute, false);
+            timePickerDialog.show();
+
+
+        });
+        etEndingTime.setOnClickListener(v -> {
+
+            // Get Current Time
+            final Calendar c = Calendar.getInstance();
+            mHour = c.get(Calendar.HOUR_OF_DAY);
+            mMinute = c.get(Calendar.MINUTE);
+
+            // Launch Time Picker Dialog
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                    (view12, hourOfDay, minute) -> {
+
+
+                        if (hourOfDay>12) {
+                            etEndingTime.setText(hourOfDay-12 + ":" + minute + " PM");
+                        } else {
+                            etEndingTime.setText(hourOfDay + ":" + minute + " AM");
+                        }
+
+                    }, mHour, mMinute, false);
+            timePickerDialog.show();
+
+
+        });
+
+        adapterDays = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, DaysList);
+        adapterDays.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        DaysSpinner.setAdapter(adapterDays);
+
 
         adapterCourse = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, CourseList);
         adapterCourse.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -136,7 +194,7 @@ public class AddNewScheduleFragment extends Fragment {
                 return;
             }
 
-            String day = etDay.getText().toString().trim();
+            String day = DaysSpinner.getSelectedItem().toString();
             String creditHour = etCreditHour.getText().toString().trim();
             String startingTime = etStartingTime.getText().toString().trim();
             String endingTime = etEndingTime .getText().toString().trim();
@@ -199,11 +257,11 @@ public class AddNewScheduleFragment extends Fragment {
 
             Toast.makeText(getContext(), "Schedule Added", Toast.LENGTH_SHORT).show();
 
-            etDay.setText("");
             etCreditHour .setText("");
             etStartingTime.setText("");
             etEndingTime .setText("");
 
+            DaysSpinner.setSelection(0);
             CourseSpinner.setSelection(0);
             FacultySpinner.setSelection(0);
             RoomSpinner .setSelection(0);
@@ -215,6 +273,7 @@ public class AddNewScheduleFragment extends Fragment {
 
         return view;
     }
+
 
     private void getScheduleNumber(){
         DatabaseReference newRef = myRef.getRef();
