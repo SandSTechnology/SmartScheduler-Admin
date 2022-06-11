@@ -39,17 +39,32 @@
         <entry key="..\:/Clients_Projects/SmartSchedulerAdmin/app/src/main/res/layout/fragment_view_all_schedules.xml" value="0.20416666666666666" />
         <entry key="..\:/Clients_Projects/SmartSchedulerAdmin/app/src/main/res/layout/recycler_item_schelue.xml" value="0.20416666666666666" />
         <entry key="..\:/Clients_Projects/SmartSchedulerAdmin/app/src/main/res/menu/toolbar_menu.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/drawable/ic_back.xml" value="0.1355" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_courses.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_departments.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_faculties.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_login.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_programs.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_rooms.xml" value="0.16875" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_sign_up.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/activity_splash.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_course.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_department.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_faculty.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_program.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_room.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_add_new_schedule.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_view_all_courses.xml" value="0.1484375" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_view_all_departments.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_view_all_faculties.xml" value="0.1484375" />
         <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_view_all_rooms.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/fragment_view_all_schedules.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/recycler_item_department.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/recycler_item_faculty.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/recycler_item_room.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/layout/recycler_item_schelue.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Mehar/AndroidStudioProjects/SmartScheduler-Admin/app/src/main/res/menu/toolbar_menu.xml" value="0.16875" />
       </map>
     </option>
   </component>

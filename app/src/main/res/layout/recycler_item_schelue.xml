@@ -18,7 +18,7 @@
             android:id="@+id/day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="10dp"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge"
@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/starting_ending_time"
             android:layout_width="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="16dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/day"
             android:text=""
@@ -39,14 +39,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/starting_ending_time"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="16dp"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/faculty"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="15dp"
             android:layout_width="wrap_content"
             android:layout_below="@+id/course"
             android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
             android:id="@+id/department"
             android:layout_width="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="15dp"
+            android:layout_marginEnd="25dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/credit_hour"
             android:text=""

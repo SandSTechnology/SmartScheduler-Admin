@@ -58,7 +58,7 @@ public class AdapterAllSchedules extends RecyclerView.Adapter<AdapterAllSchedule
             holder.credit_hour.setText(model.getCREDIT_HOUR().concat(" Credit Hour"));
 
         if (model.getDEPARTMENT()!=null && !model.getDEPARTMENT().equals(""))
-            holder.department.setText(model.getDEPARTMENT().concat(" Department"));
+            holder.department.setText(model.getDEPARTMENT());
 
         holder.view.setOnClickListener(v -> {
             //OrderViewDialogFragment dialogFragment = new OrderViewDialogFragment(model_recruiterSide);

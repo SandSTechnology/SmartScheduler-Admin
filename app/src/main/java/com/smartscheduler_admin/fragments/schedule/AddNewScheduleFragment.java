@@ -25,21 +25,23 @@ import com.smartscheduler_admin.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class AddNewScheduleFragment extends Fragment {
     EditText etStartingTime;
     EditText etEndingTime;
-    EditText etCreditHour;
     Spinner DaysSpinner;
     Spinner CourseSpinner;
     Spinner FacultySpinner;
     Spinner RoomSpinner;
     Spinner SemesterSpinner;
     Spinner DepartmentSpinner;
+    Spinner CreditSpinner;
+
     private int  mHour, mMinute;
     Button addNewSchedule;
 
-    ArrayAdapter<String> adapterDays, adapterCourse,adapterFaculty,adapterRoom,adapterSemester,adapterDepartment;
+    ArrayAdapter<String> adapterDays, adapterCourse,adapterCreditHours,adapterRoom,adapterSemester,adapterDepartment;
 
     DatabaseReference myRef;
     FirebaseAuth mAuth;
@@ -48,7 +50,12 @@ public class AddNewScheduleFragment extends Fragment {
     ArrayList<String> FacultyList = new ArrayList<>();
     ArrayList<String> RoomList = new ArrayList<>();
     ArrayList<String> SemesterList = new ArrayList<>();
+    ArrayList<String> CreditList = new ArrayList<>();
     ArrayList<String> DepartmentList = new ArrayList<>();
+
+    List<String> faculty_name = new ArrayList<String>();
+    List<String> rooms = new ArrayList<String>();
+    List<String> departments = new ArrayList<String>();
 
     int count=0;
     boolean isCountingDone=false;
@@ -62,7 +69,8 @@ public class AddNewScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_new_schedule, container, false);
 
-
+        myRef = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
 
         DaysList.add("Monday");
         DaysList.add("Tuesday");
@@ -78,23 +86,6 @@ public class AddNewScheduleFragment extends Fragment {
         CourseList.add("Course 5");
         CourseList.add("Course 6");
 
-        FacultyList.add("Asad");
-        FacultyList.add("Ali");
-        FacultyList.add("Aqib");
-        FacultyList.add("Bilal");
-        FacultyList.add("Zain");
-
-        RoomList.add("11");
-        RoomList.add("12");
-        RoomList.add("13");
-        RoomList.add("14");
-        RoomList.add("15");
-
-        DepartmentList.add("IT");
-        DepartmentList.add("BBA");
-        DepartmentList.add("BSM");
-        DepartmentList.add("LAW");
-        DepartmentList.add("BBA");
 
         SemesterList.add("1");
         SemesterList.add("2");
@@ -105,11 +96,19 @@ public class AddNewScheduleFragment extends Fragment {
         SemesterList.add("7");
         SemesterList.add("8");
 
-        etCreditHour = view.findViewById(R.id.editText_CreditHour);
+        CreditList.add("1");
+        CreditList.add("2");
+        CreditList.add("3");
+        CreditList.add("4");
+        CreditList.add("5");
+        CreditList.add("6");
+
         etStartingTime = view.findViewById(R.id.editText_StartingTime);
         etEndingTime = view.findViewById(R.id.editText_EndingTime);
         DaysSpinner = view.findViewById(R.id.allDaysSpinner);
         CourseSpinner = view.findViewById(R.id.allCoursesSpinner);
+        CreditSpinner = view.findViewById(R.id.creditHourSpinner);
+
         FacultySpinner = view.findViewById(R.id.allFacultySpinner);
         RoomSpinner = view.findViewById(R.id.allRoomSpinner);
         SemesterSpinner = view.findViewById(R.id.allSemesterSpinner);
@@ -163,31 +162,96 @@ public class AddNewScheduleFragment extends Fragment {
         adapterDays.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         DaysSpinner.setAdapter(adapterDays);
 
+        adapterCreditHours = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, CreditList);
+        adapterCreditHours.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        CreditSpinner.setAdapter(adapterCreditHours);
 
         adapterCourse = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, CourseList);
         adapterCourse.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         CourseSpinner.setAdapter(adapterCourse);
 
-        adapterFaculty = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, FacultyList);
-        adapterFaculty.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        FacultySpinner.setAdapter(adapterFaculty);
-
         adapterSemester = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, SemesterList);
         adapterSemester.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         SemesterSpinner.setAdapter(adapterSemester);
 
-        adapterDepartment = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, DepartmentList);
-        adapterDepartment.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        DepartmentSpinner.setAdapter(adapterDepartment);
+        ArrayAdapter<String> facultyAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, faculty_name);
+        facultyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        FacultySpinner.setAdapter(facultyAdapter);
 
-        adapterRoom = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, RoomList);
-        adapterRoom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        RoomSpinner.setAdapter(adapterRoom);
+        ArrayAdapter<String> areasAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, rooms);
+        areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        RoomSpinner.setAdapter(areasAdapter);
+
+        ArrayAdapter<String> depAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, departments);
+        depAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        DepartmentSpinner.setAdapter(depAdapter);
+
+        myRef.child("Rooms").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String areaName = "";
+                    if (areaSnapshot.child("NUMBER").exists())
+                        areaName = areaSnapshot.child("NUMBER").getValue(String.class);
+                    rooms.add(areaName);
+                }
+                RoomSpinner.setAdapter(areasAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        myRef.child("Departments").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String depName = "";
+                    if (areaSnapshot.child("NAME").exists())
+                        depName = areaSnapshot.child("NAME").getValue(String.class);
+                    departments.add(depName);
+                }
+                DepartmentSpinner.setAdapter(depAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        myRef.child("Faculty").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String fName = "";
+                    if (areaSnapshot.child("NAME").exists())
+                        fName = areaSnapshot.child("NAME").getValue(String.class);
+                    faculty_name.add(fName);
+                }
+
+                FacultySpinner.setAdapter(facultyAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         addNewSchedule = view.findViewById(R.id.add_Schedule_Button);
-
-        myRef = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
 
         addNewSchedule.setOnClickListener(v -> {
             if (!isCountingDone){
@@ -195,7 +259,7 @@ public class AddNewScheduleFragment extends Fragment {
             }
 
             String day = DaysSpinner.getSelectedItem().toString();
-            String creditHour = etCreditHour.getText().toString().trim();
+            String creditHour = CreditSpinner.getSelectedItem().toString();
             String startingTime = etStartingTime.getText().toString().trim();
             String endingTime = etEndingTime .getText().toString().trim();
 
@@ -225,22 +289,12 @@ public class AddNewScheduleFragment extends Fragment {
                 Toast.makeText(getContext(), "Select Course", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (faculty.equals("")) {
-                Toast.makeText(getContext(), "Select Faculty", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (room.equals("")) {
-                Toast.makeText(getContext(), "Select Room", Toast.LENGTH_SHORT).show();
-                return;
-            }
+
             if (semester.equals("")) {
                 Toast.makeText(getContext(), "Select Semester", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (department.equals("")) {
-                Toast.makeText(getContext(), "Select Department", Toast.LENGTH_SHORT).show();
-                return;
-            }
+
 
             DatabaseReference newRef = myRef.child("Schedule").child((++count)+"");
 
@@ -257,10 +311,9 @@ public class AddNewScheduleFragment extends Fragment {
 
             Toast.makeText(getContext(), "Schedule Added", Toast.LENGTH_SHORT).show();
 
-            etCreditHour .setText("");
             etStartingTime.setText("");
             etEndingTime .setText("");
-
+            CreditSpinner.setSelection(0);
             DaysSpinner.setSelection(0);
             CourseSpinner.setSelection(0);
             FacultySpinner.setSelection(0);

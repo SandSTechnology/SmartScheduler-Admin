@@ -2,65 +2,139 @@ package com.smartscheduler_admin.fragments.faculty;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.smartscheduler_admin.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddNewFacultyFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
+
 public class AddNewFacultyFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private EditText teacher_name, teacher_subject, teacher_department;
+    DatabaseReference myRef;
+    FirebaseAuth mAuth;
+    int count = 0;
+    boolean isCountingDone = false;
+    List<String> areas = new ArrayList<String>();
 
     public AddNewFacultyFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddNewFacultyFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AddNewFacultyFragment newInstance(String param1, String param2) {
-        AddNewFacultyFragment fragment = new AddNewFacultyFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_new_faculty, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_new_faculty, container, false);
+        Spinner DepartmentSpinner = view.findViewById(R.id.allDepartmentSpinner);
+        teacher_name = view.findViewById(R.id.teacherName);
+        teacher_subject = view.findViewById(R.id.subjectName);
+        CardView submitData = view.findViewById(R.id.submitCard);
+
+        myRef = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+
+        ArrayAdapter<String> areasAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, areas);
+        areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        DepartmentSpinner.setAdapter(areasAdapter);
+
+        myRef.child("Departments").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+
+                for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                    String areaName = "";
+                    if (areaSnapshot.child("NAME").exists())
+                        areaName = areaSnapshot.child("NAME").getValue(String.class);
+                    areas.add(areaName);
+                }
+
+                DepartmentSpinner.setAdapter(areasAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        submitData.setOnClickListener(v -> {
+            String name = teacher_name.getText().toString();
+            String department = DepartmentSpinner.getSelectedItem().toString();
+            String subject = teacher_subject.getText().toString().trim();
+
+
+            if (name.equals("")) {
+                Toast.makeText(getContext(), "Add Teacher Name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (subject.equals("")) {
+                Toast.makeText(getContext(), "Add Subject Name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            DatabaseReference newRef = myRef.child("Faculty").child((++count) + "");
+
+            newRef.child("ID").setValue(count);
+            newRef.child("NAME").setValue(name);
+            newRef.child("DEPARTMENT").setValue(department);
+            newRef.child("SUBJECT").setValue(subject.toUpperCase(Locale.ROOT));
+
+
+            Toast.makeText(getContext(), "Faculty Added", Toast.LENGTH_SHORT).show();
+
+            teacher_name.setText("");
+            teacher_subject.setText("");
+            DepartmentSpinner.setSelection(0);
+
+        });
+
+        getScheduleNumber();
+
+
+        return view;
+    }
+
+    private void getScheduleNumber() {
+        DatabaseReference newRef = myRef.getRef();
+        newRef.child("Faculty").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                isCountingDone = true;
+                if (snapshot.exists())
+                    count = (int) snapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }
