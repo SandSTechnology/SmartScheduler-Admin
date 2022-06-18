@@ -50,7 +50,7 @@ public class AddNewScheduleFragment extends Fragment {
     ArrayList<String> FacultyList = new ArrayList<>();
     ArrayList<String> RoomList = new ArrayList<>();
     ArrayList<String> SemesterList = new ArrayList<>();
-    ArrayList<String> CreditList = new ArrayList<>();
+        ArrayList<String> CreditList = new ArrayList<>();
     ArrayList<String> DepartmentList = new ArrayList<>();
 
     List<String> faculty_name = new ArrayList<String>();

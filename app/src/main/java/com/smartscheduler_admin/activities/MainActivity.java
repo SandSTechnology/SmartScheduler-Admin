@@ -13,23 +13,29 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.smartscheduler_admin.R;
 import com.smartscheduler_admin.util.BaseUtil;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
+    DatabaseReference myRef;
+    ArrayList<String> token = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference();
+        myRef = FirebaseDatabase.getInstance().getReference();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             String token = new BaseUtil(this).getDeviceToken();
             if (token != null && !token.equals(""))
-                myRef.child("DeviceTokens").child("AppAdmins").
+                myRef.child("DeviceTokens").child("Teachers").
                         child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("token")
                         .setValue(token);
         } else {
@@ -109,5 +115,29 @@ public class MainActivity extends AppCompatActivity {
         new BaseUtil(this).ClearPreferences();
         startActivity(new Intent(MainActivity.this, LoginActivity.class)); //Go back to login page
         finish();
+    }
+
+    private void sendNotification(){
+
+        myRef.child("DeviceToken").child("Teacher").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                       token.add(dataSnapshot.child("token").getValue().toString());
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void sendPushNotification(String token){
+
     }
 }
