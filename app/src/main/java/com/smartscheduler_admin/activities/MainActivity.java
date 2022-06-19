@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -19,14 +20,29 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.smartscheduler_admin.R;
+import com.smartscheduler_admin.services.ApiServices;
+import com.smartscheduler_admin.services.ClientApi;
+import com.smartscheduler_admin.services.Data;
+import com.smartscheduler_admin.services.MyResponse;
+import com.smartscheduler_admin.services.NotificationSender;
 import com.smartscheduler_admin.util.BaseUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     DatabaseReference myRef;
     ArrayList<String> token = new ArrayList<>();
+    SimpleDateFormat simpleDateFormat;
+    String time;
+    Calendar calander;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_main);
+        getSchedule();
+       // Notification();
 
         CardView facultiesCard = findViewById(R.id.facultiesCard);
         CardView coursesCard = findViewById(R.id.coursesCard);
@@ -117,14 +135,16 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private void sendNotification(){
+    private void Notification(){
 
-        myRef.child("DeviceToken").child("Teacher").addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child("DeviceTokens").child("Teachers").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                        token.add(dataSnapshot.child("token").getValue().toString());
+                       String tok = dataSnapshot.child("token").getValue().toString();
+                        sendNotification(tok, "Title", "Description");
 
                     }
                 }
@@ -137,7 +157,88 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void sendPushNotification(String token){
+    public void sendNotification(String deviceToken, String title, String message) {
+        ApiServices apiServices = ClientApi.getRetrofit("https://fcm.googleapis.com/").create(ApiServices.class);
 
+        Data data = new Data(title, message);
+        NotificationSender notificationSender = new NotificationSender(data, deviceToken);
+
+        apiServices.sendNotification(notificationSender).enqueue(new retrofit2.Callback<MyResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MyResponse> call, @NonNull Response<MyResponse> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null)
+                        if (response.body().success != 1) {
+
+                            Toast.makeText(MainActivity.this,"Notification Sent",Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this,"Notification failed",Toast.LENGTH_SHORT).show();
+                        }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MyResponse> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+    private void getSchedule(){
+
+        myRef.child("Schedule").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        String starttime = dataSnapshot.child("S_TIME").getValue().toString();
+                        calander = Calendar.getInstance();
+                        simpleDateFormat = new SimpleDateFormat("hh:mm");
+                        time = simpleDateFormat.format(calander.getTime());
+                       // SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                        Date startDate = null,enddate=null;
+                        try {
+                           startDate = simpleDateFormat.parse(starttime);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                           enddate = simpleDateFormat.parse(time);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        long difference = startDate.getTime() - enddate.getTime();
+                       double days = (double) (difference / (1000*60*60*24));
+                       double hours = (double) ((difference - (1000*60*60*24*days)) / (1000*60*60));
+                       double min = (double) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
+                        //int min = hours/60;
+                        Toast.makeText(MainActivity.this, ""+difference, Toast.LENGTH_SHORT).show();
+                        /*   int dateDelta = starttime.compareTo(time);
+                        switch (dateDelta) {
+                            case 0:
+                                //startTime and endTime not **Equal**
+                                Toast.makeText(MainActivity.this, "equal", Toast.LENGTH_SHORT).show();
+                                break;
+                            case 1:
+                                Toast.makeText(MainActivity.this, "greater", Toast.LENGTH_SHORT).show();
+
+                                //endTime is **Greater** then startTime
+                                break;
+                            case -1:
+                                Toast.makeText(MainActivity.this, "less", Toast.LENGTH_SHORT).show();
+
+                                //startTime is **Greater** then endTime
+                                break;
+                        }*/
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
