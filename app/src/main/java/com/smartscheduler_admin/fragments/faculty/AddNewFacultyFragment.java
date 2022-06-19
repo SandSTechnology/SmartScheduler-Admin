@@ -99,7 +99,7 @@ public class AddNewFacultyFragment extends Fragment {
                 for (DataSnapshot teacherSnapshot : dataSnapshot.getChildren()) {
                     String teacherName = "";
 
-                    if (teacherSnapshot.child("username").exists()&& teacherSnapshot.child("usertype").equals("Teacher"))
+                    if (teacherSnapshot.child("username").exists() && teacherSnapshot.child("usertype").exists() && teacherSnapshot.child("usertype").equals("Teacher"))
                         teacherName = teacherSnapshot.child("username").getValue(String.class);
                     uID = teacherSnapshot.child("uid").getValue(String.class);
                     teacher.add(teacherName);
