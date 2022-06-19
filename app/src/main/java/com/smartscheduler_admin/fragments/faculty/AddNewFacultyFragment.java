@@ -29,12 +29,14 @@ import java.util.Locale;
 
 
 public class AddNewFacultyFragment extends Fragment {
-    private EditText teacher_name, teacher_subject, teacher_department;
+    private EditText teacher_subject, teacher_department;
     DatabaseReference myRef;
     FirebaseAuth mAuth;
     int count = 0;
+    String uID= "";
     boolean isCountingDone = false;
     List<String> areas = new ArrayList<String>();
+    List<String> teacher = new ArrayList<String>();
 
     public AddNewFacultyFragment() {
     }
@@ -48,7 +50,7 @@ public class AddNewFacultyFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_new_faculty, container, false);
         Spinner DepartmentSpinner = view.findViewById(R.id.allDepartmentSpinner);
-        teacher_name = view.findViewById(R.id.teacherName);
+        Spinner TeacherSpinner = view.findViewById(R.id.allTeacherSpinner);
         teacher_subject = view.findViewById(R.id.subjectName);
         CardView submitData = view.findViewById(R.id.submitCard);
 
@@ -58,6 +60,11 @@ public class AddNewFacultyFragment extends Fragment {
         ArrayAdapter<String> areasAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, areas);
         areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         DepartmentSpinner.setAdapter(areasAdapter);
+
+
+        ArrayAdapter<String> teacherAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, teacher);
+        areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        TeacherSpinner.setAdapter(teacherAdapter);
 
         myRef.child("Departments").addValueEventListener(new ValueEventListener() {
             @Override
@@ -82,8 +89,34 @@ public class AddNewFacultyFragment extends Fragment {
             }
         });
 
+        myRef.child("AppUsers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Is better to use a List, because you don't know the size
+                // of the iterator returned by dataSnapshot.getChildren() to
+                // initialize the array
+
+                for (DataSnapshot teacherSnapshot : dataSnapshot.getChildren()) {
+                    String teacherName = "";
+
+                    if (teacherSnapshot.child("username").exists()&& teacherSnapshot.child("usertype").equals("Teacher"))
+                        teacherName = teacherSnapshot.child("username").getValue(String.class);
+                    uID = teacherSnapshot.child("uid").getValue(String.class);
+                    teacher.add(teacherName);
+                }
+
+                TeacherSpinner.setAdapter(teacherAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         submitData.setOnClickListener(v -> {
-            String name = teacher_name.getText().toString();
+
+            String name = TeacherSpinner.getSelectedItem().toString();
             String department = DepartmentSpinner.getSelectedItem().toString();
             String subject = teacher_subject.getText().toString().trim();
 
@@ -98,9 +131,9 @@ public class AddNewFacultyFragment extends Fragment {
                 return;
             }
 
-            DatabaseReference newRef = myRef.child("Faculty").child((++count) + "");
+            DatabaseReference newRef = myRef.child("Faculty").child((uID));
 
-            newRef.child("ID").setValue(count);
+            newRef.child("ID").setValue(uID);
             newRef.child("NAME").setValue(name);
             newRef.child("DEPARTMENT").setValue(department);
             newRef.child("SUBJECT").setValue(subject.toUpperCase(Locale.ROOT));
@@ -108,8 +141,8 @@ public class AddNewFacultyFragment extends Fragment {
 
             Toast.makeText(getContext(), "Faculty Added", Toast.LENGTH_SHORT).show();
 
-            teacher_name.setText("");
             teacher_subject.setText("");
+            TeacherSpinner.setSelection(0);
             DepartmentSpinner.setSelection(0);
 
         });
