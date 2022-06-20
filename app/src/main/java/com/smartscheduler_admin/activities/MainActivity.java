@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat simpleDateFormat;
     String time;
     Calendar calander;
+    int i=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,35 +186,37 @@ public class MainActivity extends AppCompatActivity {
     }
     private void getSchedule(){
 
+
         myRef.child("Schedule").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        String starttime = dataSnapshot.child("S_TIME").getValue().toString();
-                        calander = Calendar.getInstance();
-                        simpleDateFormat = new SimpleDateFormat("hh:mm");
-                        time = simpleDateFormat.format(calander.getTime());
-                       // SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                        Date startDate = null,enddate=null;
-                        try {
-                           startDate = simpleDateFormat.parse(starttime);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                           enddate = simpleDateFormat.parse(time);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String starttime = dataSnapshot.child("S_TIME").getValue().toString();
+                            starttime.toLowerCase();
+                            calander = Calendar.getInstance();
+                            simpleDateFormat = new SimpleDateFormat("hh:mm");
+                            time = simpleDateFormat.format(calander.getTime());
+                            // SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                            Date startDate = null, enddate = null;
+                            try {
+                                startDate = simpleDateFormat.parse("22:00");
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                enddate = simpleDateFormat.parse("7:00");
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
 
 
-                        long difference = startDate.getTime() - enddate.getTime();
-                       double days = (double) (difference / (1000*60*60*24));
-                       double hours = (double) ((difference - (1000*60*60*24*days)) / (1000*60*60));
-                       double min = (double) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
-                        //int min = hours/60;
-                        Toast.makeText(MainActivity.this, ""+difference, Toast.LENGTH_SHORT).show();
+                            long difference = startDate.getTime() - enddate.getTime();
+                            double days = (double) (difference / (1000 * 60 * 60 * 24));
+                            double hours = (double) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+                            double min = (double) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
+                            //int min = hours/60;
+                            Toast.makeText(MainActivity.this, "" + min, Toast.LENGTH_SHORT).show();
                         /*   int dateDelta = starttime.compareTo(time);
                         switch (dateDelta) {
                             case 0:
@@ -231,7 +234,8 @@ public class MainActivity extends AppCompatActivity {
                                 //startTime is **Greater** then endTime
                                 break;
                         }*/
-                    }
+                        }
+
                 }
             }
 
