@@ -42,6 +42,9 @@ public class SchedulesActivity extends AppCompatActivity {
 
             }
 
+
+
+
             @Override
             public void removeObserver(@NonNull LifecycleObserver observer) {
 
