@@ -89,7 +89,7 @@ public class AddNewFacultyFragment extends Fragment {
             }
         });
 
-        myRef.child("AppUsers").addValueEventListener(new ValueEventListener() {
+        myRef.child("AppUsers").child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Is better to use a List, because you don't know the size
@@ -99,10 +99,13 @@ public class AddNewFacultyFragment extends Fragment {
                 for (DataSnapshot teacherSnapshot : dataSnapshot.getChildren()) {
                     String teacherName = "";
 
-                    if (teacherSnapshot.child("username").exists() && teacherSnapshot.child("usertype").exists() && teacherSnapshot.child("usertype").equals("Teacher"))
+                    //if (teacherSnapshot.child("username").exists() && teacherSnapshot.child("usertype").exists() && teacherSnapshot.child("usertype").equals("Teacher"))
+                    String usertype = teacherSnapshot.child("usertype").getValue().toString();
+                    if(usertype.equals("Teacher")) {
                         teacherName = teacherSnapshot.child("username").getValue(String.class);
-                    uID = teacherSnapshot.child("uid").getValue(String.class);
-                    teacher.add(teacherName);
+                        uID = teacherSnapshot.child("uid").getValue(String.class);
+                        teacher.add(teacherName);
+                    }
                 }
 
                 TeacherSpinner.setAdapter(teacherAdapter);
@@ -131,9 +134,9 @@ public class AddNewFacultyFragment extends Fragment {
                 return;
             }
 
-            DatabaseReference newRef = myRef.child("Faculty").child((uID));
+            DatabaseReference newRef = myRef.child("Faculty").child((++count)+"");
 
-            newRef.child("ID").setValue(uID);
+            newRef.child("ID").setValue(count);
             newRef.child("NAME").setValue(name);
             newRef.child("DEPARTMENT").setValue(department);
             newRef.child("SUBJECT").setValue(subject.toUpperCase(Locale.ROOT));
